@@ -3,3 +3,5 @@ tqdm
 fire
 addict
 pylint
+pymongo
+pydantic

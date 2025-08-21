@@ -1,0 +1,19 @@
+services:
+
+  db:
+    image: mongodb/mongodb-community-server:7.0-ubi9
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/mongodb:/data/db
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=mongo_user
+      - MONGODB_INITDB_ROOT_PASSWORD=mongo_pass 
+    # networks:
+    #   - research-papers-qa-net
+
+
+
+# networks:
+#   research-papers-qa-net:
+#     name: research-papers-qa-net
