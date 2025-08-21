@@ -8,7 +8,9 @@ services:
       - ./data/mongodb:/data/db
     environment:
       - MONGODB_INITDB_ROOT_USERNAME=mongo_user
-      - MONGODB_INITDB_ROOT_PASSWORD=mongo_pass 
+      - MONGODB_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongodb_password
+    secrets:
+      - mongodb_password
     # networks:
     #   - research-papers-qa-net
 
@@ -17,3 +19,8 @@ services:
 # networks:
 #   research-papers-qa-net:
 #     name: research-papers-qa-net
+
+
+secrets:
+  mongodb_password:
+    file: ./mongodb_password.txt

@@ -1,12 +1,17 @@
-markdown_source=https://raw.githubusercontent.com/weiaicunzai/awesome-image-classification/refs/heads/master/README.md
-markdown_tag=image-classification
+markdown_source1=https://raw.githubusercontent.com/weiaicunzai/awesome-image-classification/refs/heads/master/README.md
+markdown_tag1=image-classification
+
+markdown_source2=https://raw.githubusercontent.com/abacaj/awesome-transformers/refs/heads/main/README.md
+markdown_tag2=transformers
+
+markdown_source3=https://raw.githubusercontent.com/Hannibal046/Awesome-LLM/refs/heads/main/README.md
+markdown_tag3=llm
 
 data_ingestion_dir=./data/raw
 
-# data-ingestion:
-# 	docker run --rm --network host  -it  \
-# 		-v $(pwd)/data_pipeline:/opt/bitnami/spark/data_pipeline \
-# 		bitnami/spark:4.0.0 bash
+data-extract:
+	python data_pipeline/data_extract.py process_markdown \
+		${markdown_source3} ${markdown_tag3}
 
 init-dirs:
 	mkdir -p data
