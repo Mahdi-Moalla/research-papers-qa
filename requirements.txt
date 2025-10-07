@@ -5,5 +5,5 @@ fire
 pandas
 langchain>=1.0.0a
 langchain-community
-langchain-pymupdf4llm
+pypdf
 langchain-openai
