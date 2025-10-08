@@ -22,11 +22,8 @@ from config import CONFIG
 import IPython
 from IPython.display import display, Markdown
 
-non_processed_pdfs_sql="""
-SELECT *  
-FROM papers
-INNER JOIN papers_raw_md USING (id) 
-WHERE papers.extract_done=TRUE AND papers.transform_done=FALSE;
+non_processed_raws_sql="""
+SELECT * FROM papers_raw WHERE is_processed=False
 """
 
 create_table_sql="""
@@ -35,6 +32,7 @@ CREATE TABLE IF NOT EXISTS papers_chunks (
     id INTEGER DEFAULT nextval('papers_chunks_ids') PRIMARY KEY,
     paper_id INTEGER,
     chunk VARCHAR NOT NULL,
+    is_processed BOOL DEFAULT FALSE,
     FOREIGN KEY (paper_id) REFERENCES papers (id)
 );
 """
@@ -45,8 +43,8 @@ def main():
 
     with duckdb.connect(CONFIG.DB_FILE)  as  con:
         con.execute(create_table_sql)
-        nonprocessed_pdfs=con.execute(non_processed_pdfs_sql).df()
-        print(nonprocessed_pdfs)
+        non_processed_raws=con.execute(non_processed_raws_sql).df()
+        print(non_processed_raws)
 
     text_splitter = RecursiveCharacterTextSplitter(
         # Set a really small chunk size, just to show.
@@ -57,12 +55,12 @@ def main():
         is_separator_regex=True,
     )
 
-    for i in tqdm(range( len(nonprocessed_pdfs) )):
-        pdf_record=nonprocessed_pdfs.iloc[i]
+    for i in tqdm(range( len(non_processed_raws) )):
+        pdf_record=non_processed_raws.iloc[i]
 
         paper_id=pdf_record.id.item()
 
-        text=pdf_record.raw_md.decode("utf-8")
+        text=pdf_record.raw_text#.decode("utf-8")
         l=text.lower().find("references")
         if l!=-1:
             text=text[:l]
@@ -72,7 +70,7 @@ def main():
         with duckdb.connect(CONFIG.DB_FILE)  as con:
             con.executemany("INSERT OR REPLACE INTO papers_chunks  (paper_id,chunk) VALUES (?, ?)",
                            [[paper_id,t] for  t in text_chunks])
-            con.execute(f"UPDATE papers SET transform_done=True WHERE id={pdf_record.id.item()}")
+            con.execute(f"UPDATE papers_raw SET is_processed=True WHERE id={pdf_record.id.item()}")
 
 
 if __name__=='__main__':

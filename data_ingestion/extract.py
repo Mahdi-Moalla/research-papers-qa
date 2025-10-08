@@ -21,16 +21,17 @@ from config import CONFIG
 import IPython
 from IPython.display import display, Markdown
 
-DOWNLOAD_BLOCK_SIZE = 1024  # 1 KB chunks
+# DOWNLOAD_BLOCK_SIZE = 1024  # 1 KB chunks
 
 non_processed_pdfs_sql="""
-SELECT *  FROM papers WHERE extract_done=False;
+SELECT *  FROM papers WHERE is_processed=False;
 """
 
 create_table_sql="""
-CREATE TABLE IF NOT EXISTS papers_raw_md (
+CREATE TABLE IF NOT EXISTS papers_raw (
     id INTEGER PRIMARY KEY,
-    raw_md BLOB NOT NULL,
+    raw_text VARCHAR NOT NULL,
+    is_processed BOOL DEFAULT FALSE,
     FOREIGN KEY (id) REFERENCES papers (id)
 );
 """
@@ -53,9 +54,9 @@ def main():
 
             data=doc[0].page_content
             with duckdb.connect(CONFIG.DB_FILE)  as con:
-                con.execute("INSERT OR REPLACE INTO papers_raw_md VALUES (?, ?)",
-                           [pdf_record.id.item(), data.encode("utf-8")])
-                con.execute(f"UPDATE papers SET extract_done=True WHERE id={pdf_record.id.item()}")
+                con.execute("INSERT OR REPLACE INTO papers_raw (id, raw_text) VALUES (?, ?)",
+                           [pdf_record.id.item(), data])
+                con.execute(f"UPDATE papers SET is_processed=True WHERE id={pdf_record.id.item()}")
 
         except:
             print(f"parsing of {pdf_record} failed")

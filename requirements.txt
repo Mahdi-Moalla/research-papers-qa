@@ -7,3 +7,4 @@ langchain>=1.0.0a
 langchain-community
 pypdf
 langchain-openai
+langchain-text-splitters

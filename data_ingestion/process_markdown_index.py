@@ -28,9 +28,7 @@ CREATE SEQUENCE IF NOT EXISTS papers_ids START 1;
 CREATE TABLE IF NOT EXISTS papers (
     id INTEGER DEFAULT nextval('papers_ids') PRIMARY KEY,
     paper_link VARCHAR NOT NULL UNIQUE,
-    extract_done BOOL DEFAULT FALSE,
-    transform_done BOOL DEFAULT FALSE,
-    load_done BOOL DEFAULT FALSE
+    is_processed BOOL DEFAULT FALSE
 );
 """
 
