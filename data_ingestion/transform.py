@@ -74,7 +74,6 @@ def main():
                            [[paper_id,t] for  t in text_chunks])
             con.execute(f"UPDATE papers SET transform_done=True WHERE id={pdf_record.id.item()}")
 
-    IPython.embed(colors='Linux')
 
 if __name__=='__main__':
     fire.Fire(main)
