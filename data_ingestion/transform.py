@@ -37,22 +37,22 @@ CREATE TABLE IF NOT EXISTS papers_chunks (
 );
 """
 
-
+reset_sql="""
+DROP TABLE papers_chunks;
+DROP SEQUENCE papers_chunks_ids;
+UPDATE papers_raw SET is_processed=FALSE;
+"""
 
 def main():
 
     with duckdb.connect(CONFIG.DB_FILE)  as  con:
+        con.execute(reset_sql)
         con.execute(create_table_sql)
         non_processed_raws=con.execute(non_processed_raws_sql).df()
         print(non_processed_raws)
 
     text_splitter = RecursiveCharacterTextSplitter(
-        # Set a really small chunk size, just to show.
-        separators=["\n\n", "\n", "."],
-        chunk_size=1000,
-        chunk_overlap=300,
-        length_function=len,
-        is_separator_regex=True,
+        **CONFIG.TEXT_SPLIT_PARAMS
     )
 
     for i in tqdm(range( len(non_processed_raws) )):

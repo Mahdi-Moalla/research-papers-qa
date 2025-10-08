@@ -9,3 +9,4 @@ pypdf
 langchain-openai
 langchain-text-splitters
 qdrant-client[fastembed]
+nltk

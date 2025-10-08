@@ -25,6 +25,10 @@ non_processed_chunks_sql="""
 SELECT * FROM papers_chunks WHERE is_processed=False
 """
 
+reset_sql="""
+UPDATE papers_chunks SET is_processed=FALSE;
+"""
+
 
 def list_embed_models():
     supported_models = (
@@ -38,6 +42,7 @@ def list_embed_models():
 
 def main():
     with duckdb.connect(CONFIG.DB_FILE)  as  con:
+        con.execute(reset_sql)
         nonprocessed_chunks=con.execute(non_processed_chunks_sql).df()
         print(nonprocessed_chunks)
 
@@ -66,7 +71,9 @@ def main():
             id=chunk_record.id.item(),
             vector=models.Document(text=chunk_record.chunk, 
                                    model=CONFIG.EMBEDDING_MODEL),
-            payload={} #save all needed metadata fields
+            payload={
+                "text": chunk_record.chunk
+            }
         )
 
         
